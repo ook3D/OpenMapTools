@@ -43,8 +43,8 @@
             this.InputFolderBrowseButton = new System.Windows.Forms.Button();
             this.InputFolderTextBox = new System.Windows.Forms.TextBox();
             this.ProcessButton = new System.Windows.Forms.Button();
-            this.BrowseFolderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.VehicleCheckBox = new System.Windows.Forms.CheckBox();
+            this.vistaFolderBrowserDialog1 = new Ookii.Dialogs.WinForms.VistaFolderBrowserDialog();
             this.SuspendLayout();
             // 
             // label8
@@ -233,8 +233,8 @@
         private System.Windows.Forms.Button InputFolderBrowseButton;
         private System.Windows.Forms.TextBox InputFolderTextBox;
         private System.Windows.Forms.Button ProcessButton;
-        private System.Windows.Forms.FolderBrowserDialog BrowseFolderDialog;
         private System.Windows.Forms.CheckBox VehicleCheckBox;
+        private Ookii.Dialogs.WinForms.VistaFolderBrowserDialog vistaFolderBrowserDialog1;
     }
 }
 

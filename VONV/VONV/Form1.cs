@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Ookii.Dialogs.WinForms;
 
 namespace VONV
 {
@@ -24,21 +25,32 @@ namespace VONV
 
         private void InputFolderBrowseButton_Click(object sender, EventArgs e)
         {
-            BrowseFolderDialog.SelectedPath = InputFolderTextBox.Text;
-            DialogResult res = BrowseFolderDialog.ShowDialog();
-            if (res == DialogResult.OK)
+
+            using (var dialog = new VistaFolderBrowserDialog())
             {
-                InputFolderTextBox.Text = BrowseFolderDialog.SelectedPath;
+                dialog.Description = "Select a folder";
+                dialog.UseDescriptionForTitle = true;
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    MessageBox.Show("Selected folder: " + dialog.SelectedPath);
+                    InputFolderTextBox.Text = dialog.SelectedPath;
+                }
             }
         }
 
         private void OutputFolderBrowseButton_Click(object sender, EventArgs e)
         {
-            BrowseFolderDialog.SelectedPath = OutputFolderTextBox.Text;
-            DialogResult res = BrowseFolderDialog.ShowDialog();
-            if (res == DialogResult.OK)
+            using (var dialog = new VistaFolderBrowserDialog())
             {
-                OutputFolderTextBox.Text = BrowseFolderDialog.SelectedPath;
+                dialog.Description = "Select a folder";
+                dialog.UseDescriptionForTitle = true;
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    MessageBox.Show("Selected folder: " + dialog.SelectedPath);
+                    OutputFolderTextBox.Text = dialog.SelectedPath;
+                }
             }
         }
 

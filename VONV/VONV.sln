@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VONV", "VONV\VONV.csproj", 
 		{DE50D3A6-B49E-47A0-ABE6-101473A00759} = {DE50D3A6-B49E-47A0-ABE6-101473A00759}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWalker.Core", "..\..\..\..\..\..\GitHub\CodeWalker\CodeWalker.Core\CodeWalker.Core.csproj", "{DE50D3A6-B49E-47A0-ABE6-101473A00759}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWalker.Core", "..\..\..\..\..\..\Users\iansp\source\repos\CodeWalker\CodeWalker.Core\CodeWalker.Core.csproj", "{DE50D3A6-B49E-47A0-ABE6-101473A00759}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
