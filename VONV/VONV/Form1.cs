@@ -10,6 +10,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Runtime;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Ookii.Dialogs.WinForms;
@@ -146,44 +147,52 @@ namespace VONV
                     var ypoly = builder.AddPoly(poly.Vertices);
                     poly.NewPoly = ypoly;
 
-
                     var f1 = poly.Flags1;
                     var f2 = poly.Flags2;
                     var f3 = poly.Flags3;
 
-                    //## FLAGS TODO
-                    if ((f1 & 1) > 0) ypoly.B00_AvoidUnk = true;
-                    if ((f1 & 2) > 0) ypoly.B01_AvoidUnk = true;
-                    if ((f1 & 4) > 0) ypoly.B02_IsFootpath = true;
-                    if ((f1 & 8) > 0) ypoly.B03_IsUnderground = true;
-                    //if ((f1 & 16) > 0) ypoly.B04_Unused = true;
-                    //if ((f1 & 32) > 0) ypoly.B05_Unused = true;
-                    if ((f1 & 64) > 0) ypoly.B06_SteepSlope = true;
-                    if ((f1 & 128) > 0) ypoly.B07_IsWater = true;
+                    // Flags for f1
+                    if ((f1 & 1) > 0) ypoly.SmallPoly = true;
+                    if ((f1 & 2) > 0) ypoly.LargePoly = true;
+                    if ((f1 & 4) > 0) ypoly.IsPavement = true;
+                    if ((f1 & 8) > 0) ypoly.IsUnderground = true;
+                    if ((f1 & 16) > 0) ypoly.Unused1 = true;
+                    if ((f1 & 32) > 0) ypoly.Unused2 = true;
+                    if ((f1 & 64) > 0) ypoly.IsTooSteepToWalk = true;
+                    if ((f1 & 128) > 0) ypoly.IsWater = true;
 
-                    if (ypoly.B02_IsFootpath)
-                    {
-                        ypoly.B00_AvoidUnk = false;
-                        //ypoly.B01_AvoidUnk = false;
-                        ////ypoly.B01_AvoidUnk = true;
-                        //ypoly.B02_IsFootpath = true;
-                        ypoly.B17_IsFlatGround = true;
-                        ypoly.B22_FootpathUnk1 = true;
-                        //ypoly.B23_FootpathUnk2 = true;
-                        //ypoly.B24_FootpathMall = true;
-                    }
+                    // Flags for f2
+                    if ((f2 & 1) > 0) ypoly.AudioProperties1 = true;
+                    if ((f2 & 2) > 0) ypoly.AudioProperties2 = true;
+                    if ((f2 & 4) > 0) ypoly.AudioProperties3 = true;
+                    if ((f2 & 8) > 0) ypoly.AudioProperties4 = true;
+                    if ((f2 & 16) > 0) ypoly.Unused3 = true;
+                    if ((f2 & 32) > 0) ypoly.NearCarNode = true;
+                    if ((f2 & 64) > 0) ypoly.IsInterior = true;
+                    if ((f2 & 128) > 0) ypoly.IsIsolated = true;
+                    if ((f2 & 256) > 0) ypoly.ZeroAreaStitchPoly = true;
+                    if ((f2 & 512) > 0) ypoly.NetworkSpawnCandidate = true;
+                    if ((f2 & 1024) > 0) ypoly.IsRoad = true;
+                    if ((f2 & 2048) > 0) ypoly.LiesAlongEdgeOfMesh = true;
+                    if ((f2 & 4096) > 0) ypoly.IsTrainTrack = true;
+                    if ((f2 & 8192) > 0) ypoly.IsShallowWater = true;
+                    if ((f2 & 16384) > 0) ypoly.PedDensity1 = true;
+                    if ((f2 & 32768) > 0) ypoly.PedDensity2 = true;
+                    if ((f2 & 65536) > 0) ypoly.PedDensity3 = true;
+
+                    // Flags for f3
+                    if ((f3 & 65536) > 0) ypoly.CoverSouth = true;
+                    if ((f3 & 131072) > 0) ypoly.CoverSouthEast = true;
+                    if ((f3 & 262144) > 0) ypoly.CoverEast = true;
+                    if ((f3 & 524288) > 0) ypoly.CoverNorthEast = true;
+                    if ((f3 & 1048576) > 0) ypoly.CoverNorth = true;
+                    if ((f3 & 2097152) > 0) ypoly.CoverNorthWest = true;
+                    if ((f3 & 4194304) > 0) ypoly.CoverWest = true;
+                    if ((f3 & 8388608) > 0) ypoly.CoverSouthWest = true;
 
 
-                    if ((f1 & 16) > 0)
-                    { }//no hits
-                    if ((f1 & 32) > 0)
-                    { }//some hits
-                    if (f1 > 255)
-                    { }//no hits
-
-
-                    ypoly.UnkX = 127;
-                    ypoly.UnkY = 127;
+                    ypoly.CentroidX = 127;
+                    ypoly.CentroidY = 127;
 
                 }
             }
