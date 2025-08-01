@@ -55,6 +55,56 @@ namespace VONV
             }
         }
 
+        [Flags]
+        public enum PolyFlags1 : byte
+        {
+            None = 0,
+            SmallPoly = 1 << 0,
+            LargePoly = 1 << 1,
+            IsPavement = 1 << 2,
+            IsUnderground = 1 << 3,
+            Unused1 = 1 << 4,
+            Unused2 = 1 << 5,
+            IsTooSteepToWalk = 1 << 6,
+            IsWater = 1 << 7
+        }
+
+        [Flags]
+        public enum PolyFlags2 : uint
+        {
+            None = 0,
+            AudioProperties1 = 1 << 0,
+            AudioProperties2 = 1 << 1,
+            AudioProperties3 = 1 << 2,
+            AudioProperties4 = 1 << 3,
+            Unused3 = 1 << 4,
+            NearCarNode = 1 << 5,
+            IsInterior = 1 << 6,
+            IsIsolated = 1 << 7,
+            ZeroAreaStitchPoly = 1 << 8,
+            NetworkSpawnCandidate = 1 << 9,
+            IsRoad = 1 << 10,
+            LiesAlongEdgeOfMesh = 1 << 11,
+            IsTrainTrack = 1 << 12,
+            IsShallowWater = 1 << 13,
+            PedDensity1 = 1 << 14,
+            PedDensity2 = 1 << 15,
+            PedDensity3 = 1 << 16,
+        }
+
+        [Flags]
+        public enum PolyFlags3 : uint
+        {
+            None = 0,
+            CoverSouth = 1 << 0,  // AudioFlag?
+            CoverSouthEast = 1 << 1, // AudioFlag?
+            CoverEast = 1 << 2, // AudioFlag?
+            CoverNorthEast = 1 << 3, // AudioFlag?
+            CoverNorth = 1 << 4,
+            CoverNorthWest = 1 << 5, // NearCarNode?
+            CoverWest = 1 << 6,
+            CoverSouthWest = 1 << 7
+        }
 
 
         private void ProcessButton_Click(object sender, EventArgs e)
@@ -140,60 +190,59 @@ namespace VONV
                 //TODO: points ("Bounds")
             }
 
-            foreach (var onv in onvlist) //create the new polys
+            foreach (var onv in onvlist)
             {
                 foreach (var poly in onv.Polys)
                 {
                     var ypoly = builder.AddPoly(poly.Vertices);
                     poly.NewPoly = ypoly;
 
-                    var f1 = poly.Flags1;
-                    var f2 = poly.Flags2;
-                    var f3 = poly.Flags3;
+                    var flags1 = (PolyFlags1)poly.Flags1;
+                    var flags2 = (PolyFlags2)poly.Flags2;
+                    var flags3 = (PolyFlags3)poly.Flags3;
 
-                    // Flags for f1
-                    if ((f1 & 1) > 0) ypoly.SmallPoly = true;
-                    if ((f1 & 2) > 0) ypoly.LargePoly = true;
-                    if ((f1 & 4) > 0) ypoly.IsPavement = true;
-                    if ((f1 & 8) > 0) ypoly.IsUnderground = true;
-                    if ((f1 & 16) > 0) ypoly.Unused1 = true;
-                    if ((f1 & 32) > 0) ypoly.Unused2 = true;
-                    if ((f1 & 64) > 0) ypoly.IsTooSteepToWalk = true;
-                    if ((f1 & 128) > 0) ypoly.IsWater = true;
+                    // flags1
+                    ypoly.SmallPoly =           flags1.HasFlag(PolyFlags1.SmallPoly);
+                    ypoly.LargePoly =           flags1.HasFlag(PolyFlags1.LargePoly);
+                    ypoly.IsPavement =          flags1.HasFlag(PolyFlags1.IsPavement);
+                    ypoly.IsUnderground =       flags1.HasFlag(PolyFlags1.IsUnderground);
+                    ypoly.Unused1 =             flags1.HasFlag(PolyFlags1.Unused1);
+                    ypoly.Unused2 =             flags1.HasFlag(PolyFlags1.Unused2);
+                    ypoly.IsTooSteepToWalk =    flags1.HasFlag(PolyFlags1.IsTooSteepToWalk);
+                    ypoly.IsWater =             flags1.HasFlag(PolyFlags1.IsWater);
 
-                    // Flags for f2
-                    if ((f2 & 1) > 0) ypoly.AudioProperties1 = true;
-                    if ((f2 & 2) > 0) ypoly.AudioProperties2 = true;
-                    if ((f2 & 4) > 0) ypoly.AudioProperties3 = true;
-                    if ((f2 & 8) > 0) ypoly.AudioProperties4 = true;
-                    if ((f2 & 16) > 0) ypoly.Unused3 = true;
-                    if ((f2 & 32) > 0) ypoly.NearCarNode = true;
-                    if ((f2 & 64) > 0) ypoly.IsInterior = true;
-                    if ((f2 & 128) > 0) ypoly.IsIsolated = true;
-                    if ((f2 & 256) > 0) ypoly.ZeroAreaStitchPoly = true;
-                    if ((f2 & 512) > 0) ypoly.NetworkSpawnCandidate = true;
-                    if ((f2 & 1024) > 0) ypoly.IsRoad = true;
-                    if ((f2 & 2048) > 0) ypoly.LiesAlongEdgeOfMesh = true;
-                    if ((f2 & 4096) > 0) ypoly.IsTrainTrack = true;
-                    if ((f2 & 8192) > 0) ypoly.IsShallowWater = true;
-                    if ((f2 & 16384) > 0) ypoly.PedDensity1 = true;
-                    if ((f2 & 32768) > 0) ypoly.PedDensity2 = true;
-                    if ((f2 & 65536) > 0) ypoly.PedDensity3 = true;
+                    // flags2
+                    ypoly.AudioProperties1 =        flags2.HasFlag(PolyFlags2.AudioProperties1);
+                    ypoly.AudioProperties2 =        flags2.HasFlag(PolyFlags2.AudioProperties2);
+                    ypoly.AudioProperties3 =        flags2.HasFlag(PolyFlags2.AudioProperties3);
+                    ypoly.AudioProperties4 =        flags2.HasFlag(PolyFlags2.AudioProperties4);
+                    ypoly.Unused3 =                 flags2.HasFlag(PolyFlags2.Unused3);
+                    ypoly.NearCarNode =             flags2.HasFlag(PolyFlags2.NearCarNode);
+                    ypoly.IsInterior =              flags2.HasFlag(PolyFlags2.IsInterior);
+                    ypoly.IsIsolated =              flags2.HasFlag(PolyFlags2.IsIsolated);
+                    ypoly.ZeroAreaStitchPoly =      flags2.HasFlag(PolyFlags2.ZeroAreaStitchPoly);
+                    ypoly.NetworkSpawnCandidate =   flags2.HasFlag(PolyFlags2.NetworkSpawnCandidate);
+                    ypoly.IsRoad =                  flags2.HasFlag(PolyFlags2.IsRoad);
+                    ypoly.LiesAlongEdgeOfMesh =     flags2.HasFlag(PolyFlags2.LiesAlongEdgeOfMesh);
+                    ypoly.IsTrainTrack =            flags2.HasFlag(PolyFlags2.IsTrainTrack);
+                    ypoly.IsShallowWater =          flags2.HasFlag(PolyFlags2.IsShallowWater);
+                    ypoly.PedDensity1 =             flags2.HasFlag(PolyFlags2.PedDensity1);
+                    ypoly.PedDensity2 =             flags2.HasFlag(PolyFlags2.PedDensity2);
+                    ypoly.PedDensity3 =             flags2.HasFlag(PolyFlags2.PedDensity3);
 
-                    // Flags for f3
-                    if ((f3 & 65536) > 0) ypoly.CoverSouth = true;
-                    if ((f3 & 131072) > 0) ypoly.CoverSouthEast = true;
-                    if ((f3 & 262144) > 0) ypoly.CoverEast = true;
-                    if ((f3 & 524288) > 0) ypoly.CoverNorthEast = true;
-                    if ((f3 & 1048576) > 0) ypoly.CoverNorth = true;
-                    if ((f3 & 2097152) > 0) ypoly.CoverNorthWest = true;
-                    if ((f3 & 4194304) > 0) ypoly.CoverWest = true;
-                    if ((f3 & 8388608) > 0) ypoly.CoverSouthWest = true;
+                    // flags3
+                    ypoly.CoverSouth =              flags3.HasFlag(PolyFlags3.CoverSouth);
+                    ypoly.CoverSouthEast =          flags3.HasFlag(PolyFlags3.CoverSouthEast);
+                    ypoly.CoverEast =               flags3.HasFlag(PolyFlags3.CoverEast);
+                    ypoly.CoverNorthEast =          flags3.HasFlag(PolyFlags3.CoverNorthEast);
+                    ypoly.CoverNorth =              flags3.HasFlag(PolyFlags3.CoverNorth);
+                    ypoly.CoverNorthWest =          flags3.HasFlag(PolyFlags3.CoverNorthWest);
+                    ypoly.CoverWest =               flags3.HasFlag(PolyFlags3.CoverWest);
+                    ypoly.CoverSouthWest =          flags3.HasFlag(PolyFlags3.CoverSouthWest);
 
 
                     ypoly.CentroidX = 127;
                     ypoly.CentroidY = 127;
-
                 }
             }
 
