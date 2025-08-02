@@ -1,19 +1,13 @@
 ﻿using CodeWalker.Core.GameFiles.FileTypes.Builders;
 using CodeWalker.GameFiles;
+using Ookii.Dialogs.WinForms;
 using SharpDX;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Runtime;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Ookii.Dialogs.WinForms;
 
 namespace VONV
 {
@@ -22,20 +16,32 @@ namespace VONV
         public Form1()
         {
             InitializeComponent();
+            this.Load += Form1_Load;
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // Load settings
+            InputFolderTextBox.Text = Properties.Settings.Default.LastInputFolder;
+            OutputFolderTextBox.Text = Properties.Settings.Default.LastOutputFolder;
+
+            OffsetXTextBox.Text = Properties.Settings.Default.OffsetX.ToString(CultureInfo.InvariantCulture);
+            OffsetYTextBox.Text = Properties.Settings.Default.OffsetY.ToString(CultureInfo.InvariantCulture);
+            OffsetZTextBox.Text = Properties.Settings.Default.OffsetZ.ToString(CultureInfo.InvariantCulture);
+        }
         private void InputFolderBrowseButton_Click(object sender, EventArgs e)
         {
-
             using (var dialog = new VistaFolderBrowserDialog())
             {
                 dialog.Description = "Select a folder";
                 dialog.UseDescriptionForTitle = true;
+                dialog.SelectedPath = Properties.Settings.Default.LastInputFolder;
 
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show("Selected folder: " + dialog.SelectedPath);
                     InputFolderTextBox.Text = dialog.SelectedPath;
+                    Properties.Settings.Default.LastInputFolder = dialog.SelectedPath;
+                    Properties.Settings.Default.Save();
                 }
             }
         }
@@ -46,11 +52,13 @@ namespace VONV
             {
                 dialog.Description = "Select a folder";
                 dialog.UseDescriptionForTitle = true;
+                dialog.SelectedPath = Properties.Settings.Default.LastOutputFolder;
 
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show("Selected folder: " + dialog.SelectedPath);
                     OutputFolderTextBox.Text = dialog.SelectedPath;
+                    Properties.Settings.Default.LastOutputFolder = dialog.SelectedPath;
+                    Properties.Settings.Default.Save();
                 }
             }
         }
@@ -73,37 +81,37 @@ namespace VONV
         public enum PolyFlags2 : uint
         {
             None = 0,
-            AudioProperties1 = 1 << 0,
-            AudioProperties2 = 1 << 1,
-            AudioProperties3 = 1 << 2,
-            AudioProperties4 = 1 << 3,
-            Unused3 = 1 << 4,
-            NearCarNode = 1 << 5,
-            IsInterior = 1 << 6,
-            IsIsolated = 1 << 7,
-            ZeroAreaStitchPoly = 1 << 8,
-            NetworkSpawnCandidate = 1 << 9,
-            IsRoad = 1 << 10,
-            LiesAlongEdgeOfMesh = 1 << 11,
-            IsTrainTrack = 1 << 12,
-            IsShallowWater = 1 << 13,
-            PedDensity1 = 1 << 14,
-            PedDensity2 = 1 << 15,
-            PedDensity3 = 1 << 16,
+            ZeroAreaStitchPoly = 1 << 0,
+            NetworkSpawnCandidate = 1 << 1,
+            IsRoad = 1 << 2,
+            LiesAlongEdgeOfMesh = 1 << 3,
+            IsTrainTrack = 1 << 4,
+            IsShallowWater = 1 << 5,
+            PedDensity1 = 1 << 6,
+            PedDensity2 = 1 << 7,
+            PedDensity3 = 1 << 8,
         }
 
         [Flags]
         public enum PolyFlags3 : uint
         {
             None = 0,
-            CoverSouth = 1 << 0,  // AudioFlag?
-            CoverSouthEast = 1 << 1, // AudioFlag?
-            CoverEast = 1 << 2, // AudioFlag?
-            CoverNorthEast = 1 << 3, // AudioFlag?
-            CoverNorth = 1 << 4,
-            CoverNorthWest = 1 << 5, // NearCarNode?
-            CoverWest = 1 << 6,
-            CoverSouthWest = 1 << 7
+            AudioFlag1 = 1 << 0,        // AudioFlag1
+            AudioFlag2 = 1 << 1,        // AudioFlag2
+            AudioFlag3 = 1 << 2,        // AudioFlag3
+            AudioFlag4 = 1 << 3,        // AudioFlag4
+            DebugUnused = 1 << 4,       // Debug
+            NearCarNode = 1 << 5,       // NearCarNode
+            IsInterior = 1 << 6,        // Interior
+            IsIsolated = 1 << 7,        // IsIsolated
+            CoverSouth = 1 << 8,        // CoverSouth
+            CoverSouthEast = 1 << 9,    // CoverSouthEast
+            CoverEast = 1 << 10,        // CoverEast
+            CoverNorthEast = 1 << 11,   // CoverNorthEast
+            CoverNorth = 1 << 12,       // CoverNorth
+            CoverNorthWest = 1 << 13,   // CoverNorthWest
+            CoverWest = 1 << 14,        // CoverWest
+            CoverSouthWest = 1 << 15,   // CoverSouthWest
         }
 
 
@@ -129,6 +137,12 @@ namespace VONV
             float offsetx = float.Parse(OffsetXTextBox.Text, CultureInfo.InvariantCulture);
             float offsety = float.Parse(OffsetYTextBox.Text, CultureInfo.InvariantCulture);
             float offsetz = float.Parse(OffsetZTextBox.Text, CultureInfo.InvariantCulture);
+
+            Properties.Settings.Default.OffsetX = offsetx;
+            Properties.Settings.Default.OffsetY = offsety;
+            Properties.Settings.Default.OffsetZ = offsetz;
+            Properties.Settings.Default.Save();
+
             Vector3 offset = new Vector3(offsetx, offsety, offsetz);
             var vehc = VehicleCheckBox.Checked;
 
@@ -202,35 +216,24 @@ namespace VONV
                     var flags3 = (PolyFlags3)poly.Flags3;
 
                     // flags1
-                    ypoly.SmallPoly =           flags1.HasFlag(PolyFlags1.SmallPoly);
-                    ypoly.LargePoly =           flags1.HasFlag(PolyFlags1.LargePoly);
-                    ypoly.IsPavement =          flags1.HasFlag(PolyFlags1.IsPavement);
-                    ypoly.IsUnderground =       flags1.HasFlag(PolyFlags1.IsUnderground);
-                    ypoly.Unused1 =             flags1.HasFlag(PolyFlags1.Unused1);
-                    ypoly.Unused2 =             flags1.HasFlag(PolyFlags1.Unused2);
-                    ypoly.IsTooSteepToWalk =    flags1.HasFlag(PolyFlags1.IsTooSteepToWalk);
-                    ypoly.IsWater =             flags1.HasFlag(PolyFlags1.IsWater);
-
-                    // flags2
-                    ypoly.AudioProperties1 =        flags2.HasFlag(PolyFlags2.AudioProperties1);
-                    ypoly.AudioProperties2 =        flags2.HasFlag(PolyFlags2.AudioProperties2);
-                    ypoly.AudioProperties3 =        flags2.HasFlag(PolyFlags2.AudioProperties3);
-                    ypoly.AudioProperties4 =        flags2.HasFlag(PolyFlags2.AudioProperties4);
-                    ypoly.Unused3 =                 flags2.HasFlag(PolyFlags2.Unused3);
-                    ypoly.NearCarNode =             flags2.HasFlag(PolyFlags2.NearCarNode);
-                    ypoly.IsInterior =              flags2.HasFlag(PolyFlags2.IsInterior);
-                    ypoly.IsIsolated =              flags2.HasFlag(PolyFlags2.IsIsolated);
-                    ypoly.ZeroAreaStitchPoly =      flags2.HasFlag(PolyFlags2.ZeroAreaStitchPoly);
-                    ypoly.NetworkSpawnCandidate =   flags2.HasFlag(PolyFlags2.NetworkSpawnCandidate);
-                    ypoly.IsRoad =                  flags2.HasFlag(PolyFlags2.IsRoad);
-                    ypoly.LiesAlongEdgeOfMesh =     flags2.HasFlag(PolyFlags2.LiesAlongEdgeOfMesh);
-                    ypoly.IsTrainTrack =            flags2.HasFlag(PolyFlags2.IsTrainTrack);
-                    ypoly.IsShallowWater =          flags2.HasFlag(PolyFlags2.IsShallowWater);
-                    ypoly.PedDensity1 =             flags2.HasFlag(PolyFlags2.PedDensity1);
-                    ypoly.PedDensity2 =             flags2.HasFlag(PolyFlags2.PedDensity2);
-                    ypoly.PedDensity3 =             flags2.HasFlag(PolyFlags2.PedDensity3);
+                    ypoly.SmallPoly =               flags1.HasFlag(PolyFlags1.SmallPoly);
+                    ypoly.LargePoly =               flags1.HasFlag(PolyFlags1.LargePoly);
+                    ypoly.IsPavement =              flags1.HasFlag(PolyFlags1.IsPavement);
+                    ypoly.IsUnderground =           flags1.HasFlag(PolyFlags1.IsUnderground);
+                    ypoly.Unused1 =                 flags1.HasFlag(PolyFlags1.Unused1);
+                    ypoly.Unused2 =                 flags1.HasFlag(PolyFlags1.Unused2);
+                    ypoly.IsTooSteepToWalk =        flags1.HasFlag(PolyFlags1.IsTooSteepToWalk);
+                    ypoly.IsWater =                 flags1.HasFlag(PolyFlags1.IsWater);
 
                     // flags3
+                    ypoly.AudioProperties1 =        flags3.HasFlag(PolyFlags3.AudioFlag1);
+                    ypoly.AudioProperties2 =        flags3.HasFlag(PolyFlags3.AudioFlag2);
+                    ypoly.AudioProperties3 =        flags3.HasFlag(PolyFlags3.AudioFlag3);
+                    ypoly.AudioProperties4 =        flags3.HasFlag(PolyFlags3.AudioFlag4);
+                    ypoly.Unused3 =                 flags3.HasFlag(PolyFlags3.DebugUnused);
+                    ypoly.NearCarNode =             flags3.HasFlag(PolyFlags3.NearCarNode);
+                    ypoly.IsInterior =              flags3.HasFlag(PolyFlags3.IsInterior);
+                    ypoly.IsIsolated =              flags3.HasFlag(PolyFlags3.IsIsolated);
                     ypoly.CoverSouth =              flags3.HasFlag(PolyFlags3.CoverSouth);
                     ypoly.CoverSouthEast =          flags3.HasFlag(PolyFlags3.CoverSouthEast);
                     ypoly.CoverEast =               flags3.HasFlag(PolyFlags3.CoverEast);
@@ -239,6 +242,17 @@ namespace VONV
                     ypoly.CoverNorthWest =          flags3.HasFlag(PolyFlags3.CoverNorthWest);
                     ypoly.CoverWest =               flags3.HasFlag(PolyFlags3.CoverWest);
                     ypoly.CoverSouthWest =          flags3.HasFlag(PolyFlags3.CoverSouthWest);
+
+                    // flags2
+                    ypoly.ZeroAreaStitchPoly =      flags2.HasFlag(PolyFlags2.ZeroAreaStitchPoly);
+                    ypoly.NetworkSpawnCandidate =   flags2.HasFlag(PolyFlags2.NetworkSpawnCandidate);
+                    ypoly.IsRoad =                  false;
+                    ypoly.LiesAlongEdgeOfMesh =     flags2.HasFlag(PolyFlags2.LiesAlongEdgeOfMesh);
+                    ypoly.IsTrainTrack =            flags2.HasFlag(PolyFlags2.IsTrainTrack);
+                    ypoly.IsShallowWater =          flags2.HasFlag(PolyFlags2.IsShallowWater);
+                    ypoly.PedDensity1 =             flags2.HasFlag(PolyFlags2.IsRoad);
+                    ypoly.PedDensity2 =             flags2.HasFlag(PolyFlags2.IsRoad);
+                    ypoly.PedDensity3 =             flags2.HasFlag(PolyFlags2.IsRoad);
 
 
                     ypoly.CentroidX = 127;
